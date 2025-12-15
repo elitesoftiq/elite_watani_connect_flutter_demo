@@ -78,6 +78,7 @@ Dio provideDio(bool isProduction) {
   return dio;
 }
 
+//SHOULD BE PROVIDED BY YOUR BACKEND
 Future<String?> _getToken(bool isProduction) async {
   try {
     final dio = provideDio(isProduction);

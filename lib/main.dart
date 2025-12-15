@@ -15,7 +15,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isProduction = true;
+    bool isProduction = false;
 
     return MaterialApp(
       home: Builder(

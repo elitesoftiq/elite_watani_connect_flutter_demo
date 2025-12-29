@@ -15,40 +15,62 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isProduction = false;
+    return const MaterialApp(home: HomePage());
+  }
+}
 
-    return MaterialApp(
-      home: Builder(
-        builder: (context) {
-          return Scaffold(
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(child: Text('Hello!')),
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
-                ElevatedButton(
-                  onPressed: () async {
-                    final token = await _getToken(isProduction);
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
-                    if (token == null) return;
+class _HomePageState extends State<HomePage> {
+  bool _isLoading = false;
+  final bool _isProduction = false;
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => WebviewPage(
-                          alwataniUrl: isProduction
-                              ? 'https://alwatani.elitesoft.iq/web/?agentId=[YOUR_AGENT_ID]&portalToken=$token'
-                              : 'https://dev.elitesoft.iq:8888/web/?agentId=[YOUR_AGENT_ID]&portalToken=$token',
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text('start'),
+  Future<void> _handleStart() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final token = await _getToken(_isProduction, context);
+
+    if (!mounted) return;
+
+    if (token == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WebviewPage(
+          alwataniUrl: _isProduction
+              ? 'https://alwatani.elitesoft.iq/web/?agentId=[YOUR_AGENT_ID]&portalToken=$token'
+              : 'https://dev.elitesoft.iq:8888/web/?agentId=[YOUR_AGENT_ID]&portalToken=$token',
+        ),
+      ),
+    );
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Center(child: Text('Hello!')),
+          const SizedBox(height: 20),
+          _isLoading
+              ? const CircularProgressIndicator()
+              : ElevatedButton(
+                  onPressed: _handleStart,
+                  child: const Text('start'),
                 ),
-              ],
-            ),
-          );
-        },
+        ],
       ),
     );
   }
@@ -79,7 +101,7 @@ Dio provideDio(bool isProduction) {
 }
 
 //SHOULD BE PROVIDED BY YOUR BACKEND
-Future<String?> _getToken(bool isProduction) async {
+Future<String?> _getToken(bool isProduction, BuildContext context) async {
   try {
     final dio = provideDio(isProduction);
     final response = await dio.post(
@@ -94,15 +116,27 @@ Future<String?> _getToken(bool isProduction) async {
       log('Access Token: $accessToken');
       return accessToken;
     } else {
-      log('Failed to get token: ${response.statusCode}');
-      log('Response data: ${response.data}');
+      _showError(
+        '${response.statusCode}\nResponse data: ${response.data}',
+        context,
+      );
       return null;
     }
   } on DioException catch (e) {
+    _showError(e.toString(), context);
     log('Error getting token: ${e.message}');
     if (e.response != null) {
       log('Error response data: ${e.response?.data}');
     }
     return null;
   }
+}
+
+void _showError(String message, BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Failed to load token. Please try again.\n$message'),
+      backgroundColor: Colors.red,
+    ),
+  );
 }

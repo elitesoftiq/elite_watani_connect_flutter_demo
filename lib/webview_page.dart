@@ -1,7 +1,5 @@
 import 'dart:developer';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter/material.dart';
 
@@ -53,19 +51,6 @@ class _WebviewPageState extends State<WebviewPage> {
             maximumZoomScale: 0,
             supportZoom: false,
             preferredContentMode: UserPreferredContentMode.MOBILE,
-            userAgent: kIsWeb
-                ? 'Mozilla/5.0 (Linux; Android 13) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/116.0.5845.163 '
-                      'Mobile Safari/537.36'
-                : Platform.isIOS
-                ? "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) "
-                      "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 "
-                      "Mobile/15E148 Safari/604.1"
-                : 'Mozilla/5.0 (Linux; Android 13) '
-                      'AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/116.0.5845.163 '
-                      'Mobile Safari/537.36',
           ),
           onWebViewCreated: (controller) {},
           shouldOverrideUrlLoading: onRedirection,

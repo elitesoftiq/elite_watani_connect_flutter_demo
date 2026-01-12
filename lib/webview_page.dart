@@ -25,6 +25,10 @@ class _WebviewPageState extends State<WebviewPage> {
       if (isStatusUrl) {
         final status = StatusUrl.fromUrl(uri.toString());
         log(status.toString());
+        //show snackbar
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(status.toString())));
       }
 
       return NavigationActionPolicy.ALLOW;
